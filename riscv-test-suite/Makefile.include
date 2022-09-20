@@ -2,14 +2,17 @@
 # Makefile for riscv-tests/isa
 #-----------------------------------------------------------------------
 
-act_dir := .
-src_dir := $(act_dir)/src
-work_dir := $(WORK)
+act_dir := $(ROOTDIR)/riscv-test-suite
+work_dir := $(ROOTDIR)/riscv-test-suite/out
 work_dir_isa := $(work_dir)/rv$(XLEN)i_m/$(RISCV_DEVICE)
+src_dir := $(act_dir)/rv$(XLEN)i_m/$(RISCV_DEVICE)/src
 
-include $(act_dir)/Makefrag
 ifneq ($(RISCV_TEST),)
 	target_tests = $(RISCV_TEST).elf
+else
+	tests_list = $(wildcard $(src_dir)/*.S)
+	tests_name = $(patsubst $(src_dir)/%.S,%,$(tests_list))
+    target_tests = $(patsubst $(src_dir)/%.S,%.elf,$(tests_list))
 endif
 
 default: all
@@ -24,7 +27,7 @@ INCLUDE=$(TARGETDIR)/$(RISCV_TARGET)/device/rv$(XLEN)i_m/$(RISCV_DEVICE)/Makefil
 ifeq ($(wildcard $(INCLUDE)),)
     $(error Cannot find '$(INCLUDE)`. Check that RISCV_TARGET and RISCV_DEVICE are set correctly.)
 endif
--include $(INCLUDE)
+include $(INCLUDE)
 
 #------------------------------------------------------------
 # Build and run assembly tests
@@ -33,26 +36,31 @@ endif
 	$(V) echo "Execute $(@)"
 	$(V) $(RUN_TARGET)
 
-
-define compile_template
-
 $(work_dir_isa)/%.elf: $(src_dir)/%.S
-	$(V) echo "Compile $$(@)"
-	@mkdir -p $$(@D)
-	$(V) $(COMPILE_TARGET)
+	@$(V) echo "Compile $(@F)"
+	@mkdir -p $(@D)
+	@$(V) $(COMPILE_TARGET)
 
 .PRECIOUS: $(work_dir_isa)/%.elf
 
-endef
+$(work_dir_isa)/%.vh: $(work_dir_isa)/%.elf
+	@$(V) echo "Make $(@F)"
+	@$(RISCV_OBJCOPY) -O binary $< tmp.bin
+	@$(RISCV_OBJCOPY) --verilog-data-width=4 --reverse-bytes=4 -I binary -O verilog tmp.bin $@
+	@rm tmp.bin
 
 target_elf = $(foreach e,$(target_tests),$(work_dir_isa)/$(e))
+target_vh = $(patsubst %.elf,%.vh,$(target_elf))
 target_log = $(patsubst %.elf,%.log,$(target_elf))
+tests_ls = $(addprefix test_,$(tests_name))
 
-compile: $(target_elf)
-run: $(target_log)
+compile: $(target_vh)
+tests:   $(target_vh) $(tests_ls)
+
+#run: $(target_log)
 
 #------------------------------------------------------------
 # Clean up
 
-clean:
+clean_test:
 	rm -rf $(work_dir)
