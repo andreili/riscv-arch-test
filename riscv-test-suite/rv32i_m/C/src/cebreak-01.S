@@ -5,7 +5,7 @@
 //
 // This assembly file tests the c.ebreak instruction of the RISC-V C extension.
 // 
-
+#define rvtest_mtrap_routine True
 #include "model_test.h"
 #include "arch_test.h"
 

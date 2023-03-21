@@ -353,7 +353,7 @@
         .warning "Should never get here for RV32"                               ;\
     .endif                                                                      ;\
  .endif                                                                         ;\
- .option pop
+ .option pop                                                                    ;
 
 
 /**** fixed length LA macro ****/
