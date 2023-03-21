@@ -1,5 +1,51 @@
 # CHANGELOG
 
+## [3.6.2] - 2023-02-08
+- Remove RV64IB from ISA list of zext test. 
+
+## [3.6.1] - 2023-01-28
+- Fix satp restore condition.
+
+## [3.6.0] - 2023-01-26
+  - Removed the bugs in RVTEST_GOTO_LOWER_MODE macro
+  - Removed the bugs in RVTEST_GOTO_MMODE macro and defined strap_routine directive.
+  - Updated RVTEST_TRAP_SAVEAREA and RVTEST_TRAP_EPILOG macros to refine the definitions of per mode save area macros.
+  - Added better indications of when the trap signature area is overrun
+  - Ensured that the trap handler keeps the trampoline 64B aligned (need for CLIC spec)
+  - fixed the handling of when xTVEC was not initialized and also could not be written
+  - rewritten the save_GPR macro to it now compiles
+  - some miscellaneous optimizations
+
+## [3.5.3] - 2022-11-22
+  - Fix Canary definition according to sigalign.
+  - Fix SIGALIGN definition.
+  - Fix inconsistencies in tests.
+  - Add Zicsr to ISA in RV32 privilege tests
+  - Modify signature size requirement to multiple of 4.
+
+## [3.5.2] - 2022-11-25
+  - adding a pull request template
+  - removed riscv-test-stats directory and migrated those to a gdrive folder [here](https://drive.google.com/drive/folders/1KBRy6OgxnOPTDgyfJDj0gcMi5VdMLtVo?usp=share_link)
+  - updated contribution guide on steps to done to upload test stats for PRs
+
+## [3.5.1] - 2022-10-28
+  - Add test cases for P-ext
+  - Correct TEST_PKRR_OP() macro in arch_test.h 
+  - Avoid reusing RVTEST_SIGUPD_FID() for P-ext macros: SIGALIGN may not be defined when FLEN==0
+
+## [3.5.0] - 2022-10-17
+- Add Canaries (labels - sig_begin_canary. tsig_begin_canary, tsig_end_canary, sig_end_canary)
+- Signature boundary labels (rvtest_sig_begin and rvtest_sig_end) (enables the new trap handler to fix #262)
+- Zicsr ISA update for priv tests (#233)
+- Default data section should be 16 bytes. This expands default rvtest_data region to be at least 16 bytes (#211)
+- Replace la/li ops with LA/LI macros in tests (#275)
+- Remove trap handler enable macro from misalign1-jalr tests (#281)
+- Move misalign1-jalr test into I directory. (#281)
+- Move fmem tests into the [F|D]/src directory
+- Fix correctval in tests to ?? instead of 0. (#256)
+- Remove the riscv-target directory (#259)
+- Fix the store instruction used in 64bit K tests from `sw` to `SREG` (#282)
+
 ## [3.4.1] - 2022-09-11
   - Fix trailing space in arch_test.h
 
@@ -41,7 +87,6 @@
   - Add sigalign based changes to F&D sigupd macros.
   - Add helper macro to check offset legality.
 
-
 ## [2.7.1] - 2022-03-18
   - Fix bug in auto-offset update for SIGUPD macros.
 
@@ -53,7 +98,6 @@
 ## [2.6.3] - 2022-03-04
   - import and synchronize P-ext changes in arch_test.h from riscv-ctg
   - automatically adjust base and offset if offset gets too big
-
 
 ## [2.6.2] - 2022-02-24
   - modified verify.sh to ignore comments in reference signature during diff operation [#230]

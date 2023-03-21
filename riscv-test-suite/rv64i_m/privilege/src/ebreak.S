@@ -9,7 +9,7 @@
 #include "model_test.h"
 #include "arch_test.h"
 
-RVTEST_ISA("RV64I")
+RVTEST_ISA("RV64I_Zicsr")
 
 # Test code region
 .section .text.init
@@ -23,15 +23,17 @@ RVTEST_CODE_BEGIN
 
     # ---------------------------------------------------------------------------------------------
 
-    la      x1, test_A_res
+    LA(     x1,test_A_res)
     
-    li      x2, 0x11111111
+    LI(     x2,0x11111111)
+    .option push;
+    .option norvc;
     ebreak
     nop
     nop
     sw      x0, 0(x1)
     sw      x2, 4(x1)
-    
+    .option pop;   
     RVMODEL_IO_WRITE_STR(x30, "# Test part A - test EBREAK\n");
 
     RVMODEL_IO_WRITE_STR(x30, "# Test End\n")
@@ -51,15 +53,23 @@ RVTEST_DATA_END
 
 # Output data section.
 RVMODEL_DATA_BEGIN
+rvtest_sig_begin:
+sig_begin_canary:
+CANARY;
 test_A_res:
   .fill 2, 4, 0xdeadbeef
 
+#ifdef rvtest_mtrap_routine
 mtrap_sigptr:
-  .fill 4, 4, 0xdeadbeef
+  .fill 8, 4, 0xdeadbeef
+#endif
 
 #ifdef rvtest_gpr_save
 gpr_save:
   .fill 32*(XLEN/32), 4, 0xdeadbeef
 #endif
 
+sig_end_canary:
+CANARY;
+rvtest_sig_end:
 RVMODEL_DATA_END
