@@ -9,3 +9,7 @@
 *.DS_Store
 
 riscv-target/
+*.elf
+*.vh
+*.debug
+*.objdump
