@@ -1,1 +1,0 @@
-include $(TARGETDIR)/$(RISCV_TARGET)/device/rv$(XLEN)i_m/Makefile.include
